@@ -1,0 +1,64 @@
+#!/usr/bin/env python2
+import argparse
+import sys
+
+commands = []
+
+class Command:
+    def __init__(self, name, function, description):
+        self.name = name
+        self.function = function
+        self.description = description
+
+def add_command(*args):
+    commands.append(Command(*args))
+
+def find_command_by_name(name):
+    for command in commands:
+        if command.name == name:
+            return command
+
+def command_type(string):
+    command = find_command_by_name(string)
+    if command:
+        return command
+    else:
+        raise argparse.ArgumentTypeError('No such command.')
+
+def gen_epilog():
+    buf = []
+    buf.append('available commands:\n')
+    for command in commands:
+        buf.append('  ')
+        buf.append(command.name)
+        buf.append(' - ')
+        buf.append(command.description)
+        buf.append('\n')
+    return ''.join(buf)
+
+def info_command(**kwargs):
+    import ora_tools.commands.info as command
+    command.run(**kwargs)
+
+def export_command(**kwargs):
+    import ora_tools.commands.export as command
+    command.run(**kwargs)
+
+if __name__ == '__main__':
+    add_command('info', info_command, 'Print information about the file and its layers.')
+    add_command('export', export_command, 'Export one or multiple layers.')
+
+    parser = argparse.ArgumentParser(
+        description='Processes OpenRaster (.ora) files.',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=gen_epilog())
+    parser.add_argument('command', type=command_type)
+    parser.add_argument('args', nargs=argparse.REMAINDER, default=[])
+
+    args = parser.parse_args()
+
+    command = args.command
+    command.function(
+        prog=sys.argv[0]+' '+command.name,
+        description=command.description,
+        args=args.args)

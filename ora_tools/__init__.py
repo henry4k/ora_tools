@@ -1,8 +1,9 @@
 #!/usr/bin/env python2
-import zipfile
 import xml.etree.ElementTree
 import posixpath
+import os.path
 import sys
+import ora_tools.virtual_fs as vfs
 
 def pump_io(input_file, output_file):
     while True:
@@ -63,13 +64,16 @@ class OraLayer:
 
 class OraFileReader:
     def __init__(self, file_name):
-        self.zip_file = zipfile.ZipFile(file_name, 'r')
+        if os.path.isdir(file_name):
+            self.vfs = vfs.DirectoryFileSystem(file_name, 'r')
+        else:
+            self.vfs = vfs.ZipFileSystem(file_name, 'r')
         if not self._is_valid():
             raise RuntimeError('Mimetype verification failed.')
         self._read_xml()
 
     def close(self):
-        self.zip_file.close()
+        self.vfs.close()
         pass
 
     def __enter__(self):
@@ -80,13 +84,13 @@ class OraFileReader:
 
     def _is_valid(self):
         try:
-            with self.zip_file.open('mimetype', 'r') as mimetype:
+            with self.vfs.open('mimetype', 'r') as mimetype:
                 return mimetype.readline() == 'image/openraster'
         except KeyError:
             return False
 
     def _read_xml(self):
-        with self.zip_file.open('stack.xml', 'r') as xml_file:
+        with self.vfs.open('stack.xml', 'r') as xml_file:
             tree = xml.etree.ElementTree.parse(xml_file)
             image = tree.getroot()
             if image.tag != 'image':
@@ -132,7 +136,7 @@ class OraFileReader:
         else:
             extension = posixpath.splitext(layer.file_name)[1]
             destination_path = destination_prefix+extension
-            with self.zip_file.open(layer.file_name, 'r') as input_file:
+            with self.vfs.open(layer.file_name, 'r') as input_file:
                 with open(destination_path, 'wb') as output_file:
                     pump_io(input_file, output_file)
             return destination_path
