@@ -5,7 +5,7 @@ def run(prog, description, args):
     parser = argparse.ArgumentParser(prog=prog, description=description)
     parser.add_argument('file')
     parser.add_argument('layer')
-    parser.add_argument('prefix')
+    parser.add_argument('out')
 
     args = parser.parse_args(args)
 
@@ -13,5 +13,4 @@ def run(prog, description, args):
     layer = reader.get_layer_by_name(args.layer)
     if not layer:
         raise RuntimeException('Can\'t find layer.')
-    exported_file = reader.export_layer(layer, args.prefix)
-    print(exported_file)
+    reader.export_layer(layer, args.out)

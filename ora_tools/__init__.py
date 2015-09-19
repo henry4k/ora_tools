@@ -83,15 +83,12 @@ class OraFileReader:
             if layer.get_path() == path:
                 return layer
 
-    def export_layer(self, layer, destination_prefix):
+    def export_layer(self, layer, destination_path):
         try:
             if len(layer.childs) > 0:
                 raise RuntimeException('Blending not supported yet.')
         except AttributeError:
             pass
-        extension = posixpath.splitext(layer.file_name)[1]
-        destination_path = destination_prefix+extension
         with self.vfs.open(layer.file_name, 'r') as input_file:
             with open(destination_path, 'wb') as output_file:
                 pump_io(input_file, output_file)
-        return destination_path
