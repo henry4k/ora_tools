@@ -22,7 +22,7 @@ class Node:
 
     def set_parent(self, parent):
         if self.parent:
-            raise RuntimeException('Parent node may only be set once.')
+            raise RuntimeError('Parent node may only be set once.')
         else:
             self.parent = parent
 
@@ -59,6 +59,6 @@ def from_xml(element):
             child_node = from_xml(child_element)
             node.append_child(child_layer)
     else:
-        raise RuntimeException('Unknown element.')
+        raise RuntimeError('Unknown element.')
 
     return node

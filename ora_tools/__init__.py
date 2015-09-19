@@ -44,7 +44,7 @@ class OraFileReader:
             tree = xml.etree.ElementTree.parse(xml_file)
             image = tree.getroot()
             if image.tag != 'image':
-                raise RuntimeException('Expected image element.')
+                raise RuntimeError('Expected image element.')
 
             self.width  = int(image.get('w'))
             self.height = int(image.get('h'))
@@ -86,7 +86,7 @@ class OraFileReader:
     def export_layer(self, layer, destination_path):
         try:
             if len(layer.childs) > 0:
-                raise RuntimeException('Blending not supported yet.')
+                raise RuntimeError('Blending not supported yet.')
         except AttributeError:
             pass
         with self.vfs.open(layer.file_name, 'r') as input_file:

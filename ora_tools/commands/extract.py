@@ -12,5 +12,5 @@ def run(prog, description, args):
     reader = ora.OraFileReader(args.file)
     layer = reader.get_layer_by_name(args.layer)
     if not layer:
-        raise RuntimeException('Can\'t find layer.')
+        raise RuntimeError('Can\'t find layer.')
     reader.export_layer(layer, args.out)

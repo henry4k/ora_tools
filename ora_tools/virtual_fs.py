@@ -5,7 +5,7 @@ import os.path
 def check_mode(vfs_mode, file_mode):
     if vfs_mode == 'r':
         if file_mode != 'r':
-            raise RuntimeException('Mode ot allowed.')
+            raise RuntimeError('Mode ot allowed.')
 
 class VirtualFileSystem:
     def __init__(self, mode):
